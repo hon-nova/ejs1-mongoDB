@@ -1,1 +1,2 @@
 1. `npm install mongoose`
+2. Note: In JavaScript, any function that is declared with the `async` keyword automatically returns a `Promise`, regardless of whether the function explicitly returns a promise inside it
