@@ -1,7 +1,10 @@
 const express = require('express');
 const path = require('path');
 const app = express();
+const cors = require('cors')
 const bodyParser = require('body-parser')
+const bcrypt = require('bcrypt');
+
 /**
  * Mongodb Nodejs driver
  */
@@ -11,13 +14,10 @@ const { MongoClient } = require('mongodb');
 const client = new MongoClient(uri);
 
 // Set the view engine to EJS
+app.use(cors());
 app.set('view engine', 'ejs');
-
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use(bodyParser.json());
-
-
 app.get('/register',(req,res)=>{
    res.render('register')
 })
@@ -32,9 +32,8 @@ async function connectToMongoDB() {
       const db = client.db('ejs1');
       const usersCollection = db.collection('Users');
 
-      // POST request to add users to the MongoDB collection
-      //ADMIN
-      app.post('/users', async (req, res) => {
+     
+      app.post('/admin/users', async (req, res) => {
          const { username, email, password } = req.body;
          const hashedPassword = await bcrypt.hash(password, 10);
          
@@ -44,11 +43,17 @@ async function connectToMongoDB() {
                username, email, 
                password: hashedPassword,
                role: 0 });
-            console.log(`User added with ID: ${result.insertedId}`);
+            console.log(`User added with ID: ${result.insertedId}`);  
+            //testing
 
-            console.log(`result backend::${result}`)
-              // console.log(`username::${result.username}`)
-              // Send back the received data as a JSON response
+            // Fetch the inserted user document by its ID
+            const insertedUser = await usersCollection.findOne({ _id: result.insertedId });
+            console.log(`insertedUser::${insertedUser}`)
+
+            if (insertedUser) {
+               console.log(`Inserted latest user's email: ${insertedUser.email}`);
+            }
+                        // Send back the received data as a JSON response
             res.json({
                   success: true,
                   message: 'User registered successfully',
@@ -65,9 +70,20 @@ async function connectToMongoDB() {
               });
           }
       });
+      app.post('/login', async(req,res)=>{
+         //1 retrieve user
+         try {
+
+            const {email,password} = req.body
+
+            const retrievedUser = await usersCollection.findOne({ email: email, });
+         } catch(err){
+            console.log(`LOGIn FAILED:: ${err}`)
+         };
+         //2 compare the user inputs and the db user
+      })
       app.get('/admin/users', async (req, res) => {
         const users = await db.collection('Users').find().toArray();
-        console.log(`ALL USERS BACKEND:: ${users[0].email}`)
         res.render('admin/adminUsers', { users });
       });
       app.post('/admin/users/delete/:id', async (req, res) => {
