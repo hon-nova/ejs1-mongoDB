@@ -35,17 +35,21 @@ async function connectToMongoDB() {
       // POST request to add users to the MongoDB collection
       //ADMIN
       app.post('/users', async (req, res) => {
-          const { username, email, password } = req.body;
+         const { username, email, password } = req.body;
+         const hashedPassword = await bcrypt.hash(password, 10);
          
-          try {
+         try {
               // Insert the user into the 'Users' collection
-              const result = await usersCollection.insertOne({ username, email, password });
-              console.log(`User added with ID: ${result.insertedId}`);
+            const result = await usersCollection.insertOne({ 
+               username, email, 
+               password: hashedPassword,
+               role: 0 });
+            console.log(`User added with ID: ${result.insertedId}`);
 
-              console.log(`result backend::${result}`)
+            console.log(`result backend::${result}`)
               // console.log(`username::${result.username}`)
               // Send back the received data as a JSON response
-              res.json({
+            res.json({
                   success: true,
                   message: 'User registered successfully',
                   userId: result.insertedId,
@@ -70,8 +74,7 @@ async function connectToMongoDB() {
         const userId = req.params.id;
         await db.collection('users').deleteOne({ _id: userId });
         res.redirect('/admin/users');
-      });
-      
+      });      
       
       //END ADMIN
 
