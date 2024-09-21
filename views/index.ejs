@@ -8,9 +8,20 @@
    <title>GREETING PAGE</title>
 </head>
 <body>
-   <h1>Hello User</h1>
+   <h1>GREETING PAGE</h1>
    <div>
-        <a href="/login">Click to login</a>
+      <h1></h1>
+      <a href="/login">Click to login</a>
    </div>
+   <script>
+      document.addEventListener('DOMContentLoaded',()=>{
+         let username = sessionStorage.getItem('username')
+      if (username){
+         document.getElementsByTagName('h1')[0].innerHTML=`Hello ${username}`
+      }
+      })
+      
+      
+   </script>
 </body>
 </html>

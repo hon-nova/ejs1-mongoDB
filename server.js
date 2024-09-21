@@ -19,6 +19,9 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 
+app.get('/', (req,res)=>{
+   res.render('index')
+})
 app.get('/register',(req,res)=>{
    res.render('register')
 })
@@ -35,7 +38,7 @@ async function connectToMongoDB() {
       // Create unique indexes for email and username
 
       await usersCollection.createIndex({ email: 1 }, { unique: true });
-      await usersCollection.createIndex({ username: 1 }, { unique: true });
+      // await usersCollection.createIndex({ username: 1 }, { unique: true });
      
       app.post('/admin/users', async (req, res) => {
          const { username, email, password } = req.body;
@@ -47,16 +50,16 @@ async function connectToMongoDB() {
                username, email, 
                password: hashedPassword,
                role: 0 });
-            console.log(`User added with ID: ${result.insertedId}`);  
+            // console.log(`User added with ID: ${result.insertedId}`);  
             //testing
 
              /**testing */
             const insertedUser = await usersCollection.findOne({ _id: result.insertedId });
-            console.log(`insertedUser::${insertedUser}`)
+            // console.log(`insertedUser::${insertedUser}`)
               
-            if (insertedUser) {
-               console.log(`Inserted latest user's email: ${insertedUser.email}`);
-            } /** end testing */
+            // if (insertedUser) {
+               // console.log(`Inserted latest user's email: ${insertedUser.email}`);
+            //} /** end testing */
                         // Send back the received data as a JSON response
             res.json({
                   success: true,
@@ -86,26 +89,30 @@ async function connectToMongoDB() {
       });
       
       // User Login
-app.post('/login', async (req, res) => {
+      app.post('/auth/login', async (req, res) => {
 
-   const { email, password } = req.body; 
-   try {
-     const user = await usersCollection.findOne({ email });
-     if (!user) {
-       return res.status(400).json({ message: 'Incorrect email or password.' });
-     }
- 
-     const match = await bcrypt.compare(password, user.password);
-     if (!match) {
-       return res.status(400).json({ message: 'Incorrect email or password.' });
-     }
- 
-   //   res.json({ message: 'Login successful!', userId: user._id });
-   res.redirect('/');
-   } catch (err) {
-     res.status(500).json({ message: 'Error logging in.' });
-   }
- });
+         const { email, password } = req.body; 
+         try {
+         const user = await usersCollection.findOne({ email });
+         if (!user) {
+            return res.status(400).json({ message: 'User Not Found!' });
+         }
+         /**testing */
+
+         // console.log(`user email backend::${user.email}`)
+      
+         const match = await bcrypt.compare(password, user.password);
+         if (!match) {
+            return res.status(400).json({ message: 'Incorrect email or password.' });
+         }      
+         res.json({ message: 'Login successful!', user:user });
+         // res.redirect('/');
+
+         } catch (err) {
+         res.status(500).json({ message: 'Error logging in.' });
+         }
+      });
+
       app.get('/admin/users', async (req, res) => {
         const users = await db.collection('Users').find().toArray();
         res.render('admin/adminUsers', { users });
