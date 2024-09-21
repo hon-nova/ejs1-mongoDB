@@ -18,6 +18,7 @@ app.use(cors());
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
+
 app.get('/register',(req,res)=>{
    res.render('register')
 })
@@ -31,7 +32,10 @@ async function connectToMongoDB() {
       console.log('Connected to MongoDB');
       const db = client.db('ejs1');
       const usersCollection = db.collection('Users');
+      // Create unique indexes for email and username
 
+      await usersCollection.createIndex({ email: 1 }, { unique: true });
+      await usersCollection.createIndex({ username: 1 }, { unique: true });
      
       app.post('/admin/users', async (req, res) => {
          const { username, email, password } = req.body;
@@ -46,13 +50,13 @@ async function connectToMongoDB() {
             console.log(`User added with ID: ${result.insertedId}`);  
             //testing
 
-            // Fetch the inserted user document by its ID
+             /**testing */
             const insertedUser = await usersCollection.findOne({ _id: result.insertedId });
             console.log(`insertedUser::${insertedUser}`)
-
+              
             if (insertedUser) {
                console.log(`Inserted latest user's email: ${insertedUser.email}`);
-            }
+            } /** end testing */
                         // Send back the received data as a JSON response
             res.json({
                   success: true,
@@ -63,25 +67,45 @@ async function connectToMongoDB() {
                   password
               });
           } catch (err) {
-              console.error('Error inserting user into database', err);
-              res.status(500).json({
+              // Error code 11000 is for duplicate key errors in MongoDB
+               if (err.code === 11000) {
+                  const errorMessage = err.keyValue.email ? 
+                  'Email already exists. Please choose a different email.' : 
+                  'Username already exists. Please choose a different username.';
+                  
+                  return res.status(400).json({success: false,
+                  message: errorMessage
+                  });
+               }
+               console.error('Error registering user:', err);
+               res.status(500).json({
                   success: false,
                   message: 'Failed to register user'
-              });
+               });  
           }
       });
-      app.post('/login', async(req,res)=>{
-         //1 retrieve user
-         try {
+      
+      // User Login
+app.post('/login', async (req, res) => {
 
-            const {email,password} = req.body
-
-            const retrievedUser = await usersCollection.findOne({ email: email, });
-         } catch(err){
-            console.log(`LOGIn FAILED:: ${err}`)
-         };
-         //2 compare the user inputs and the db user
-      })
+   const { email, password } = req.body; 
+   try {
+     const user = await usersCollection.findOne({ email });
+     if (!user) {
+       return res.status(400).json({ message: 'Incorrect email or password.' });
+     }
+ 
+     const match = await bcrypt.compare(password, user.password);
+     if (!match) {
+       return res.status(400).json({ message: 'Incorrect email or password.' });
+     }
+ 
+   //   res.json({ message: 'Login successful!', userId: user._id });
+   res.redirect('/');
+   } catch (err) {
+     res.status(500).json({ message: 'Error logging in.' });
+   }
+ });
       app.get('/admin/users', async (req, res) => {
         const users = await db.collection('Users').find().toArray();
         res.render('admin/adminUsers', { users });

@@ -21,11 +21,31 @@ document.addEventListener('DOMContentLoaded',function(){
 
       const result = await response.json();
       console.log(`RESULT frontend::${result}`)
+      // console.log(`result pushed backend message::${result.message}`)
 
       // Display the response message
-      document.getElementById('responseMessage').innerHTML = `
-         <div class="alert alert-success">User data submitted: ${result.username} ${result.email}</div>
-      `;
+      let msg=result.message
+      let isSuccess = result.success
+      msg = isSuccess ?  `
+         <div class="alert alert-success">${msg} ${result.username} ${result.email}</div> `: `<div class="alert alert-danger">${msg}</div>`
+
+      document.getElementById('responseMessage').innerHTML =msg
+
+      const loginAuthentication =async()=>{
+         try {
+            const response = await fetch('http//localhost:3000/login')
+            if(response.ok){
+               let result = await response.json()
+               console.log(`user input login::${result.message}`)
+   
+            }
+         } catch(err){
+            console.log(`Failed to login::${err}`)
+            document.querySelector("#errorMessage").innerHTML=result.message
+         }
+        
+      }
+      
       const readUsers = async () => {
          try {
            const response = await fetch('http://localhost:3000/admin/users');  // Include protocol and full URL

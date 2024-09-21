@@ -13,7 +13,8 @@
       <h1 class="text-center">Login</h1>
 
       <!-- Login Form -->
-      <form id="loginForm" class="mt-4">
+      <div id="errorMessage" class="alert alert-danger"></div>
+      <form id="loginForm" class="mt-4" action="/login" method="POST">
          <div class="mb-3">
             <label for="username" class="form-label">Username</label>
             <input type="text" class="form-control" id="username" name="username" required>
