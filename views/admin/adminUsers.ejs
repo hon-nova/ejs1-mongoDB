@@ -25,17 +25,17 @@
          <tbody>        
             <% users.forEach((user,index)=> { %>   
            <tr id="userRow-<%= user._id %>">           
-               <td><%= index+1%></td>
+               <td><%= user._id %> Index: <%= index %></td>
                <td><%= user.username%></td>
                <td><%= user.email %></td>  
                <td><%= user.role %></td>
-               <td><button onclick="onUpdate('<%= user._id %>')" style="border:none;"><i class="bi bi-pencil-fill"></i></button></td>   
-               <td><button onclick="onDelete('<%= user._id %>')" style="border:none; color:red;"><i class="bi bi-trash3-fill"></i></button></td>      
+               <td><button class="update-button" style="border:none;"><i class="bi bi-pencil-fill"></i></button></td>   
+               <td><button class="delete-button" style="border:none; color:red;"><i class="bi bi-trash3-fill"></i></button></td>      
            </tr>
            <%  }) %>
          </tbody>
        </table>
    </div>
-   <script src="/js/admin/users.js"></script>
+   <script src="/js/admin/users.js"></script>  
 </body>
 </html>

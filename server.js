@@ -4,6 +4,8 @@ const app = express();
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const bcrypt = require('bcrypt');
+const { ObjectId } = require('mongodb');
+
 
 /**
  * Mongodb Nodejs driver
@@ -128,13 +130,12 @@ async function connectToMongoDB() {
          try {
              const result = await usersCollection.deleteOne({ _id: new ObjectId(userId) }); // Ensure you're using the correct MongoDB ObjectId
      
-             if (result.deletedCount === 1) {
-                 res.status(200).json({ message: 'User deleted successfully' });
-             } else {
-                 res.status(404).json({ message: 'User not found' });
-             }
+             if (result.deletedCount === 0) {
+                 res.status(404).json({ error: 'User Not Found' });
+             } 
+             res.status(200).json({message:'User deletedly successfully'})
          } catch (err) {
-             res.status(500).json({ message: 'Error deleting user' });
+             res.status(500).json({ error: 'Server Error deleting user' });
          }
      });
        
