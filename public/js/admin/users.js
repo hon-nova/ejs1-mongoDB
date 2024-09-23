@@ -3,10 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
   fetch('/apijson/users')
     .then(response => response.json())
     .then(data => {
-        const users = data.users;  // Get the users object from the API response
-      //   users.forEach(user=>{
-      //     console.log(`fronend each user::${user.email}`)
-      //   })
+        const users = data.users;  
       /** for update functionality */
       document.querySelectorAll('.update-button').forEach((button, index) => {
          button.addEventListener('click', () => {
@@ -38,9 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       updateForm.addEventListener('submit', async (event) => {
           event.preventDefault();
-      
-          // Get the user ID from a data attribute or similar method
-          const userId = updateForm.dataset.userId;
+   
           const newEmail = document.querySelector('#new-email').value; 
           console.log(`newEmail frontend::${newEmail}`);
       

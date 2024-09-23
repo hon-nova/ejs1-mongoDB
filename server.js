@@ -154,41 +154,47 @@ async function connectToMongoDB() {
       console.log( `backend update loaded`)
       const userId = req.params.id;
       console.log(`userId BACKEND::${userId}`)
-      // Check if the provided ID is valid for MongoDB
-      // if (!ObjectId.isValid(userId)) {
-      //    console.log(`False userID`)
-      //    return res.status(400).json({ error: "Invalid user ID" });
-      // } else {
-      //    console.log(`Valid userID`)
-      // }
+      
       try {
-         const {email}=req.body
+         const {email}= req.body
+         console.log(`Request Body:`, req.body); // Debugging
          const update = {
             $set: {               
                 email: email,                
             }
         };
+        console.log(`Update Payload:`, update);
 
+        console.log(`newEmail::${email}`)
         // Find the user by ID and update it
+        const existingUser = await usersCollection.findOne({ _id: new ObjectId(userId) });
+         console.log(`Existing User: ${existingUser}`);
         const result = await usersCollection.findOneAndUpdate(
             { _id: new ObjectId(userId) }, // Filter by the user _id
             update, // The update operation
-            { returnOriginal: false } // Option to return the updated document
+            { returnDocument: 'after'  } // Option to return the updated document
         );
-         // console.log(`stm update::${stm}`)
+         console.log(`result.value::${result.value}`)
+
          if (result.value) {
             console.log(`Updated user: ${result.value}`);
             res.status(200).json({ message: "User updated successfully", user: result.value });
         } else {
-            res.status(404).json({ error: "User not found" });
-        }
-         
+            // res.status(404).json({ error: "User not found" });
+            const updatedUser = await usersCollection.findOne({ _id: new ObjectId(userId) });
+            console.log(`Manually fetched updated user: ${updatedUser}`);
+            
+            if (updatedUser) {
+                res.status(200).json({ message: "User updated successfully", user: updatedUser });
+               } else {
+                  res.status(404).json({ error: "User not found after update" });
+              }
+        }        
 
       } catch(error){
          res.status(500).json({error: "Server Error Updating user"})
       }
-     })
-       
+     })       
       
       //END ADMIN
 
