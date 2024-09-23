@@ -149,6 +149,37 @@ async function connectToMongoDB() {
              res.status(500).json({ error: 'Server Error deleting user' });
          }
      });
+     app.put('/admin/users/:id',async (req,res)=>{
+      console.log( `backend update loaded`)
+      const userId = req.params.id;
+      try {
+
+         const {email}=req.body
+         const update = {
+            $set: {               
+                email: email,                
+            }
+        };
+
+        // Find the user by ID and update it
+        const result = await usersCollection.findOneAndUpdate(
+            { _id: new ObjectId(userId) }, // Filter by the user _id
+            update, // The update operation
+            { returnOriginal: false } // Option to return the updated document
+        );
+         // console.log(`stm update::${stm}`)
+         if (result.value) {
+            console.log(`Updated user: ${result.value}`);
+            res.status(200).json({ message: "User updated successfully", user: result.value });
+        } else {
+            res.status(404).json({ error: "User not found" });
+        }
+         
+
+      } catch(error){
+         res.status(500).json({error: "Server Error Updating user"})
+      }
+     })
        
       
       //END ADMIN
