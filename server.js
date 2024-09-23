@@ -18,6 +18,8 @@ const client = new MongoClient(uri);
 // Set the view engine to EJS
 app.use(cors());
 app.set('view engine', 'ejs');
+// app.set('views', path.join(__dirname, 'views')); 
+app.set('views','./views')
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 
@@ -116,14 +118,23 @@ async function connectToMongoDB() {
       });
 
       app.get('/admin/users', async (req, res) => {
-        const users = await db.collection('Users').find().toArray();
-        res.render('admin/adminUsers', { users });
-      });
-      // app.post('/admin/users/delete/:id', async (req, res) => {
-      //   const userId = req.params.id;
-      //   await db.collection('users').deleteOne({ _id: userId });
-      //   res.redirect('/admin/users');
-      // });    
+         try {
+            const users = await usersCollection.find().toArray();
+            res.render('admin/adminUsers',{users})
+         } catch(error){
+            
+         }
+       
+      });        
+      app.get('/apijson/users', async(req,res)=>{
+         try {
+            const users = await usersCollection.find().toArray();
+            res.status(200).json({users})
+         } catch(error){
+            console.error('Error fetching users:', error);
+            res.status(500).send('Error fetching users');
+         }
+      })
       app.delete('/admin/users/:id', async (req, res) => {
          const userId = req.params.id;
          
@@ -142,10 +153,7 @@ async function connectToMongoDB() {
       
       //END ADMIN
 
-      // Main index route
-      app.get('/', (req, res) => {
-          res.render('index');
-      });
+      
 
   } catch (err) {
       console.error('Failed to connect to MongoDB', err);

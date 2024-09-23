@@ -1,26 +1,19 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const readUsers = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/admin/users"); // Include protocol and full URL
-      if (response.ok) {
-        const users = await response.json(); // Get the JSON data
-        console.log("Users fetched:", users);
-        
-        
-        return users;
-      } else {
-        console.error("Failed to fetch users");
-        return [];
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      return [];
-    }
-  };
 
-  readUsers();
+  fetch('/apijson/users')
+    .then(response => response.json())
+    .then(data => {
+        const users = data.users;  // Get the users object from the API response
+        users.forEach(user=>{
+          console.log(`fronend each user::${user.email}`)
+        })
+        
+    })
+    .catch(error => {
+        console.error('Error fetching users:', error);
+    });
 
-  document.querySelector("tbody").addEventListener("click", function (event) {
+   document.querySelector("tbody").addEventListener("click", function (event) {
     if (event.target.closest(".delete-button")) {
       const userId = event.target.closest("tr").id.split("-")[1];
       onDelete(userId);
@@ -58,4 +51,12 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("Error deleting user:", error);
     }
   };
-});
+  
+})
+   
+
+
+
+
+ 
+
