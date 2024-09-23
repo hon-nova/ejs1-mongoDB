@@ -149,11 +149,19 @@ async function connectToMongoDB() {
              res.status(500).json({ error: 'Server Error deleting user' });
          }
      });
+
      app.put('/admin/users/:id',async (req,res)=>{
       console.log( `backend update loaded`)
       const userId = req.params.id;
+      console.log(`userId BACKEND::${userId}`)
+      // Check if the provided ID is valid for MongoDB
+      // if (!ObjectId.isValid(userId)) {
+      //    console.log(`False userID`)
+      //    return res.status(400).json({ error: "Invalid user ID" });
+      // } else {
+      //    console.log(`Valid userID`)
+      // }
       try {
-
          const {email}=req.body
          const update = {
             $set: {               
