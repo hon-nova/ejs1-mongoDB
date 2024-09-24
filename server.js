@@ -6,7 +6,6 @@ const bodyParser = require('body-parser')
 const bcrypt = require('bcrypt');
 const { ObjectId } = require('mongodb');
 
-
 /**
  * Mongodb Nodejs driver
  */
@@ -15,7 +14,6 @@ const uri='mongodb+srv://honaws24:AyrYvOSLX3PY7yiE@honcluster1.eavgv.mongodb.net
 const { MongoClient } = require('mongodb');
 const client = new MongoClient(uri);
 
-// Set the view engine to EJS
 app.use(cors());
 app.set('view engine', 'ejs');
 // app.set('views', path.join(__dirname, 'views')); 
@@ -32,15 +30,14 @@ app.get('/register',(req,res)=>{
 app.get('/login',(req,res)=>{
    res.render('login')
 })
-// Connect to MongoDB
+
 async function connectToMongoDB() {
   try {
       await client.connect();
       console.log('Connected to MongoDB');
       const db = client.db('ejs1');
       const usersCollection = db.collection('Users');
-      // Create unique indexes for email and username
-
+      
       await usersCollection.createIndex({ email: 1 }, { unique: true });
       // await usersCollection.createIndex({ username: 1 }, { unique: true });
      
@@ -48,23 +45,18 @@ async function connectToMongoDB() {
          const { username, email, password } = req.body;
          const hashedPassword = await bcrypt.hash(password, 10);
          
-         try {
-              // Insert the user into the 'Users' collection
+         try {             
             const result = await usersCollection.insertOne({ 
                username, email, 
                password: hashedPassword,
                role: 0 });
-            // console.log(`User added with ID: ${result.insertedId}`);  
-            //testing
-
+            
              /**testing */
             const insertedUser = await usersCollection.findOne({ _id: result.insertedId });
-            // console.log(`insertedUser::${insertedUser}`)
-              
+            // console.log(`insertedUser::${insertedUser}`)              
             // if (insertedUser) {
                // console.log(`Inserted latest user's email: ${insertedUser.email}`);
-            //} /** end testing */
-                        // Send back the received data as a JSON response
+            //} /** end testing */                       
             res.json({
                   success: true,
                   message: 'User registered successfully',
@@ -73,8 +65,7 @@ async function connectToMongoDB() {
                   email,
                   password
               });
-          } catch (err) {
-              // Error code 11000 is for duplicate key errors in MongoDB
+          } catch (err) {              
                if (err.code === 11000) {
                   const errorMessage = err.keyValue.email ? 
                   'Email already exists. Please choose a different email.' : 
@@ -90,8 +81,7 @@ async function connectToMongoDB() {
                   message: 'Failed to register user'
                });  
           }
-      });
-      
+      });      
       // User Login
       app.post('/auth/login', async (req, res) => {
 
@@ -116,7 +106,6 @@ async function connectToMongoDB() {
          res.status(500).json({ message: 'Error logging in.' });
          }
       });
-
       app.get('/admin/users', async (req, res) => {
          try {
             const users = await usersCollection.find().toArray();
@@ -149,12 +138,10 @@ async function connectToMongoDB() {
              res.status(500).json({ error: 'Server Error deleting user' });
          }
      });
-
      app.put('/admin/users/:id',async (req,res)=>{
       console.log( `backend update loaded`)
       const userId = req.params.id;
-      console.log(`userId BACKEND::${userId}`)
-      
+            
       try {
          const {email}= req.body
          console.log(`Request Body:`, req.body); // Debugging
@@ -166,13 +153,13 @@ async function connectToMongoDB() {
         console.log(`Update Payload:`, update);
 
         console.log(`newEmail::${email}`)
-        // Find the user by ID and update it
+        // testing
         const existingUser = await usersCollection.findOne({ _id: new ObjectId(userId) });
          console.log(`Existing User: ${existingUser}`);
         const result = await usersCollection.findOneAndUpdate(
-            { _id: new ObjectId(userId) }, // Filter by the user _id
-            update, // The update operation
-            { returnDocument: 'after'  } // Option to return the updated document
+            { _id: new ObjectId(userId) }, 
+            update,
+            { returnDocument: 'after'  } 
         );
          console.log(`result.value::${result.value}`)
 
@@ -180,32 +167,28 @@ async function connectToMongoDB() {
             console.log(`Updated user: ${result.value}`);
             res.status(200).json({ message: "User updated successfully", user: result.value });
         } else {
-            // res.status(404).json({ error: "User not found" });
+            
             const updatedUser = await usersCollection.findOne({ _id: new ObjectId(userId) });
-            console.log(`Manually fetched updated user: ${updatedUser}`);
+            console.log(`Manually fetched updated user: ${updatedUser.value}`);
             
             if (updatedUser) {
                 res.status(200).json({ message: "User updated successfully", user: updatedUser });
                } else {
                   res.status(404).json({ error: "User not found after update" });
               }
-        }        
-
+        } 
       } catch(error){
          res.status(500).json({error: "Server Error Updating user"})
       }
-     })       
-      
-      //END ADMIN
-
-      
+     })     
+      //END ADMIN      
 
   } catch (err) {
       console.error('Failed to connect to MongoDB', err);
   }
 }
 let PORT=3000
-// Start the server after connecting to MongoDB
+
 connectToMongoDB().then(() => {
   app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);

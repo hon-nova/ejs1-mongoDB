@@ -10,15 +10,11 @@ document.addEventListener("DOMContentLoaded", function () {
              // Get the email from the user's row
              const currentEmail = document.querySelector(`#userRow-${users[index]._id} td:nth-child(3)`).innerText;
              console.log(`currentEmail::${currentEmail}`)
-             
-             // Set the form's current email field with the clicked user's email
              document.getElementById('current-email').value = currentEmail;
-             
-             // Store the userId for form submission
+            
              document.getElementById('update-form').dataset.userId = users[index]._id;
          });
-     });
-        
+     });        
     })
     .catch(error => {
         console.error('Error fetching users:', error);
@@ -44,8 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   method: 'PUT',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ email: newEmail })  // Send the new email to the server
-              });
-      
+              });      
               if (response.ok) {
                   alert('Email updated successfully!');
                   // Update the email in the table without refreshing the page
@@ -57,10 +52,9 @@ document.addEventListener("DOMContentLoaded", function () {
               alert('Error occurred while updating email.');
           }
       });
-      // Populate the current email (if needed)
+      
    const currentEmail = document.querySelector(`#userRow-${userId} td:nth-child(3)`).innerText;
    document.querySelector('#current-email').value = currentEmail;
-
    // You could also clear the new-email input if needed
    document.querySelector('#new-email').value = '';
     }
