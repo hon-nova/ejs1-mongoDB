@@ -31,12 +31,17 @@ app.get('/login',(req,res)=>{
    res.render('login')
 })
 
+// app.get('/products',(req,res)=>{
+//    res.render('homeProducts')
+// })
+
 async function connectToMongoDB() {
   try {
       await client.connect();
       console.log('Connected to MongoDB');
       const db = client.db('ejs1');
       const usersCollection = db.collection('Users');
+      const productsCollection =db.collection('Products')
       
       await usersCollection.createIndex({ email: 1 }, { unique: true });
       // await usersCollection.createIndex({ username: 1 }, { unique: true });
@@ -181,7 +186,44 @@ async function connectToMongoDB() {
          res.status(500).json({error: "Server Error Updating user"})
       }
      })     
-      //END ADMIN      
+      //END ADMIN 
+      //START PRODUCTS
+      app.post('/admin/products',async(req,res)=>{
+         const {name,category,price,dateArrival,photo} = req.body
+         try {
+            const newProduct = await productsCollection.insertOne({
+               name,category,price,dateArrival,photo
+            })
+
+            let insertedProduct = await productsCollection.findOne({_id: newProduct.insertedId})
+            if(insertedProduct){
+               console.log(`New Product found with name ::${insertedProduct.name}`)
+            } else {
+               console.log(`No new product added`)
+            }
+            res.status(200).json({
+               success: true,
+               message: 'Product Addeded successfully',
+               productId: newProduct.insertedId,
+               name,dateArrival,price,photo
+           });
+
+         } catch (error){
+            console.log(`Failed to retrieved products, ERRORS:: ${error}`)
+            res.status(500).json({error:"Unable to add product"})
+         }
+      })
+      app.get('/admin/products',async (req,res)=>{       
+         try {
+            const products = await db.productsCollection.find().toArray()
+            res.render('admin/adminProducts',{products})
+         } catch(error){
+            console.log(`Failed to retrieved products backend`)
+         }
+        
+      })
+      
+      //END PRODUCTS
 
   } catch (err) {
       console.error('Failed to connect to MongoDB', err);

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Admin Products</title>
+</head>
+<body>
+   <div>
+      <form id="productForm">
+         <div class="form-group mb-2"> 
+            <label for="name">Product Name:</label>
+            <input type="text" class="form-control" id="name" name="name" required> 
+         </div>   
+         <div class="form-group mb-2"> 
+            <label for="category">Category:</label>
+            <select id="category">
+               <option value="">Choose category</option>
+               <option value="men">Men</option>
+               <option value="women">Women</option>
+               <option value="children">Children</option>
+            </select>            
+         </div> 
+         <div class="form-group mb-2">
+            <label for="price">Unit Price:</label>
+            <input type="number" name="price" id="price" required/>
+         </div>
+         
+         <div class="form-group mb-2">
+            <label for="dateArrival">Date Arrival: </label>
+            <input type="date" name="date" id="dateArrival" required>
+         </div>
+         <div class="form-group mb-2">
+            <label for="photo">Photo</label>
+            <input type="image" name="photo" id="photo" required>
+         </div>             
+         <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+   </div>
+   <script src="js/admin/products.js"></script>
+</body>
+</html>
