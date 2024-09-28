@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded',function(){
             
             setTimeout(()=>{
             alert(`FRONTEND: retrieved email:: Helo ${result.user.username}`)
-            window.location.href = '/';
+            window.location.href = '/products';
             },2000)
                 
             } else {

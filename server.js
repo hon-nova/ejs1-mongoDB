@@ -189,7 +189,11 @@ async function connectToMongoDB() {
       //END ADMIN 
       //START PRODUCTS
       app.post('/admin/products',async(req,res)=>{
+         //name, category, price, dateArrival,photo
          const {name,category,price,dateArrival,photo} = req.body
+         // console.log(`req.body::${req.body}`)
+         console.log('Received product data:', JSON.stringify(req.body, null, 2));
+
          try {
             const newProduct = await productsCollection.insertOne({
                name,category,price,dateArrival,photo
@@ -201,26 +205,49 @@ async function connectToMongoDB() {
             } else {
                console.log(`No new product added`)
             }
+           
             res.status(200).json({
                success: true,
                message: 'Product Addeded successfully',
                productId: newProduct.insertedId,
-               name,dateArrival,price,photo
+               name, dateArrival,price,photo
            });
+         // res.render('admin/adminProducts',{products})
 
          } catch (error){
-            console.log(`Failed to retrieved products, ERRORS:: ${error}`)
+            console.log(`Failed to add product, ERRORS:: ${error}`)
             res.status(500).json({error:"Unable to add product"})
          }
       })
       app.get('/admin/products',async (req,res)=>{       
          try {
-            const products = await db.productsCollection.find().toArray()
+            const products = await productsCollection.find().toArray()
+            if(products){
+               // console.log(`Fetched products successfully:: ${products}`)
+            }
             res.render('admin/adminProducts',{products})
          } catch(error){
             console.log(`Failed to retrieved products backend`)
-         }
-        
+         }        
+      })
+      app.get('/products',async (req,res)=>{       
+         try {
+            const products = await productsCollection.find().toArray()
+            if (products){
+               console.log(`PRODUCTS BACKEND:: ${products[0].name}`)
+            }
+            res.render('homeProducts',{products})
+         } catch(error){
+            console.log(`Failed to retrieved products backend`)
+         }        
+      })
+      app.get('/api/products',async (req,res)=>{       
+         try {
+            const products = await productsCollection.find().toArray()
+            res.status(200).json({products})
+         } catch(error){
+            console.log(`SERVER BACKEND ERROR`)
+         }        
       })
       
       //END PRODUCTS
