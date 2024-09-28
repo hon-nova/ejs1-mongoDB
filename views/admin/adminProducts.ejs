@@ -25,7 +25,11 @@
          <div class="form-group mb-2">
             <label for="price">Unit Price:</label>
             <input type="text" name="price" id="price" required/>
-         </div>         
+         </div> 
+         <div class="form-group mb-2"></div>
+            <label for="price">Arrival Quantity:</label>
+            <input type="number" name="quantityArrival" id="quantityArrival" required/>
+         </div>        
          <div class="form-group mb-2">
             <label for="dateArrival">Date Arrival: </label>
             <input type="date" name="dateArrival" id="dateArrival" required>
@@ -42,10 +46,13 @@
       <ul>
          <% products.forEach(product => { %>
            <li><strong><%= product.name %></strong> - $<%= product.price %></li>
+           <li><img src="<%= product.photo%>" width="200" height="200" alt="photo"/></li>
          <% }); %>
        </ul>
    </div>
-   <script src="js/admin/products.js"></script>
+   <script src="/js/admin/products.js">
+      
+   </script>
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
 </body>

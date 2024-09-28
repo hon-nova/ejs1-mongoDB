@@ -190,13 +190,15 @@ async function connectToMongoDB() {
       //START PRODUCTS
       app.post('/admin/products',async(req,res)=>{
          //name, category, price, dateArrival,photo
-         const {name,category,price,dateArrival,photo} = req.body
+         const {name,category,price,dateArrival,photo,quantityArrival} = req.body
          // console.log(`req.body::${req.body}`)
          console.log('Received product data:', JSON.stringify(req.body, null, 2));
+         // Check if values are being extracted correctly
+         console.log(`Extracted values - Name: ${name}, Price: ${price}, Quantity Arrival: ${quantityArrival} Date Arrival: ${dateArrival}, Photo: ${photo}`);
 
          try {
             const newProduct = await productsCollection.insertOne({
-               name,category,price,dateArrival,photo
+               name,category,price,dateArrival,photo,quantityArrival
             })
 
             let insertedProduct = await productsCollection.findOne({_id: newProduct.insertedId})
@@ -208,9 +210,12 @@ async function connectToMongoDB() {
            
             res.status(200).json({
                success: true,
-               message: 'Product Addeded successfully',
+               message: 'Product added successfully',
                productId: newProduct.insertedId,
-               name, dateArrival,price,photo
+               name: insertedProduct.name,
+               dateArrival: insertedProduct.dateArrival,
+               price: insertedProduct.price,
+               photo: insertedProduct.photo
            });
          // res.render('admin/adminProducts',{products})
 

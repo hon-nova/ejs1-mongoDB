@@ -1,27 +1,31 @@
-document.addEventListener("DOMContentLoaded",()=>{
+console.log(  `Read products.js`)
+document.addEventListener("DOMContentLoaded", () => {
+
    console.log(`starting products.js`)
+
    let productForm =document.querySelector("#productForm")
-   productForm.addEventListener('submit',async (e)=>{
+   productForm.addEventListener('submit',async(e) => {
       e.preventDefault()
       console.log(`running productForm begins`)
       let name=document.querySelector("#name").value
       let category= document.querySelector("#category").value
       let price=parseFloat(document.querySelector("#price").value)
       let dateArrival=document.querySelector("#dateArrival").value
-      let photo =document.querySelector("#photo").value //not sure here      
+      let photo =document.querySelector("#photo").value //not sure here   
+      let quantityArrival=parseInt(document.querySelector("#quantityArrival").value )  
 
       let product ={
-         name,category,price,dateArrival,photo
+         name,category,price,dateArrival,photo,quantityArrival
       }
       console.log('Product data to send:', product); 
 
-      let response = await fetch(`http://localhost:3000/admin/products`,{
-         method:"POST",
-         headers :{
-            "Content-Type":"application/json"
+      let response = await fetch(`http://localhost:3000/admin/products`, {
+         method: "POST",
+         headers: {
+             "Content-Type": "application/json"
          },
-         body:JSON.stringify(product)
-      })
+         body: JSON.stringify(product) // This should be correct
+     });
       let result = await response.json()
       if(response.ok){
          console.log(`FRONTEND successfully added product.`)
